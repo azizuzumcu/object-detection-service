@@ -1,22 +1,24 @@
 # src/app/main.py
 
-from fastapi import FastAPI, File, UploadFile
-import base64
-from app.detect import detect_objects  # Eğer modul yolu farklıysa ".detect" olarak da deneyin
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi.responses import JSONResponse
+from app.detect import detect_objects
 
-app = FastAPI()
+app = FastAPI(title="Yolo ONNX Object Detection")
 
-@app.post("/detect")
-@app.post("/detect/{label}")
-async def detect(label: str = None, file: UploadFile = File(...)):
-    # Gelen resmi oku
+@app.post("/detect", summary="Upload image and detect objects")
+async def detect_endpoint(
+    label: str = Query(None, description="Filter by this label, e.g. car"),
+    file: UploadFile = File(..., description="JPEG/PNG image to analyze")
+):
+    # 1) Content-type kontrolü
+    if file.content_type not in ("image/jpeg", "image/png"):
+        raise HTTPException(status_code=415, detail="Only JPEG or PNG files are supported")
+    # 2) Bytes’a çevir
     image_bytes = await file.read()
-    # Nesne tespiti yap
-    results = detect_objects(image_bytes, label)
-    # (Opsiyonel) Aynı resmi base64 olarak döndür
-    encoded_image = base64.b64encode(image_bytes).decode("utf-8")
-    return {
-        "image": encoded_image,
-        "objects": results,
-        "count": len(results)
-    }
+    # 3) Algoritmayı çağır
+    results = detect_objects(image_bytes, label=label)
+    # 4) Hata/boş durum kontrolü
+    if not results:
+        return JSONResponse(status_code=200, content={"message": "No objects found", "objects": []})
+    return {"objects": results, "count": len(results)}
