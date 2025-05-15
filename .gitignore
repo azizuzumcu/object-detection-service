@@ -7,5 +7,3 @@ __pycache__/
 venv/
 .env
 
-src/app/model/*.pt
-src/app/model/*.onnx
