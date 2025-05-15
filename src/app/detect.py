@@ -42,20 +42,30 @@ def preprocess(image_bytes: bytes, img_size: int = 640):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = letterbox(img, new_size=img_size)
     arr = np.array(img, dtype=np.float32) / 255.0
-    arr = np.transpose(arr, (2, 0, 1))[None, ...]  # 1x3xHxW
-    return arr
+    return np.transpose(arr, (2, 0, 1))[None, ...]  # 1x3xHxW
+
+def xywh2xyxy(boxes: np.ndarray):
+    # boxes: Nx4 = [x_center, y_center, w, h]
+    x, y, w, h = boxes[:,0], boxes[:,1], boxes[:,2], boxes[:,3]
+    x1 = x - w/2
+    y1 = y - h/2
+    x2 = x + w/2
+    y2 = y + h/2
+    return np.stack([x1, y1, x2, y2], axis=1)
 
 def postprocess(outputs, conf_thres: float = 0.25):
-    pred = outputs[0][0]  # (N,85)
+    pred = outputs[0][0]          # (N,85)
     mask = pred[:, 4] > conf_thres
     pred = pred[mask]
-    boxes = pred[:, :4].tolist()
-    scores = pred[:, 4].tolist()
-    labels = np.argmax(pred[:, 5:], axis=1).tolist()
+    # 1) xywh → xyxy
+    boxes_xywh = pred[:, :4]
+    boxes = xywh2xyxy(boxes_xywh)
+    scores = pred[:, 4]
+    labels = np.argmax(pred[:, 5:], axis=1)
     return boxes, scores, labels
 
 def non_max_suppression(boxes, scores, iou_threshold: float = 0.5):
-    if not boxes:
+    if len(boxes) == 0:
         return []
     boxes = np.array(boxes)
     scores = np.array(scores)
@@ -83,25 +93,20 @@ def detect_objects(image_bytes: bytes, label: str = None):
     img_in = preprocess(image_bytes, img_size=640)
     outputs = sess.run(None, {"images": img_in})
 
-    # Eşik sonrası
     boxes, scores, labels = postprocess(outputs, conf_thres=0.1)
-
-    # NMS ile çoğulları temizle
-    keep = non_max_suppression(boxes, scores, iou_threshold=0.5)
-    boxes = [boxes[i] for i in keep]
-    scores = [scores[i] for i in keep]
-    labels = [labels[i] for i in keep]
+    keep = non_max_suppression(boxes, scores, iou_threshold=0.3)
+    boxes = boxes[keep]
+    scores = scores[keep]
+    labels = labels[keep]
 
     results = []
     for box, score, cls_idx in zip(boxes, scores, labels):
-        cls_name = COCO_LABELS[cls_idx]
+        cls_name = COCO_LABELS[int(cls_idx)]
         if label is None or cls_name == label:
-            x1, y1, x2, y2 = box
-            x_min, x_max = min(x1, x2), max(x1, x2)
-            y_min, y_max = min(y1, y2), max(y1, y2)
+            x1, y1, x2, y2 = box.tolist()
             results.append({
                 "label": cls_name,
                 "confidence": float(score),
-                "bbox": [float(x_min), float(y_min), float(x_max), float(y_max)]
+                "bbox": [x1, y1, x2, y2]
             })
     return results
