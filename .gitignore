@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.python-*
+
+.vscode/
+
+venv/
+.env
+
+src/app/model/*.pt
+src/app/model/*.onnx
