@@ -11,14 +11,14 @@ async def detect_endpoint(
     label: str = Query(None, description="Filter by this label, e.g. car"),
     file: UploadFile = File(..., description="JPEG/PNG image to analyze")
 ):
-    # 1) Content-type kontrolü
+    # Content-type kontrolü
     if file.content_type not in ("image/jpeg", "image/png"):
         raise HTTPException(status_code=415, detail="Only JPEG or PNG files are supported")
-    # 2) Bytes’a çevir
+    # Bytes’a çevir
     image_bytes = await file.read()
-    # 3) Algoritmayı çağır
+    # Algoritmayı çağır
     results = detect_objects(image_bytes, label=label)
-    # 4) Hata/boş durum kontrolü
+    # Hata durum kontrolü
     if not results:
         return JSONResponse(status_code=200, content={"message": "No objects found", "objects": []})
     return {"objects": results, "count": len(results)}

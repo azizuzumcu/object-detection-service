@@ -6,7 +6,7 @@ from PIL import Image, ImageOps
 import io
 from pathlib import Path
 
-# COCO’nun 80 sınıf adı
+# COCO 80 sınıf adı
 COCO_LABELS = [
     "person","bicycle","car","motorbike","aeroplane","bus","train","truck","boat","traffic light",
     "fire hydrant","stop sign","parking meter","bench","bird","cat","dog","horse","sheep","cow",
