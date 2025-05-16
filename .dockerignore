@@ -1,14 +1,20 @@
+# Sanal ortam
 venv/
 
+# Python cache
 __pycache__/
 *.py[cod]
 
+# Proje versiyon kontrolü
 .git
 .gitignore
 
+# IDE / editor ayarları
 .vscode/
 *.suo
 *.user
 *.swp
 
+# Compose dosyası, local loglar vb.
 docker-compose.yml
+*.log

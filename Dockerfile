@@ -11,13 +11,15 @@ RUN apt-get update && \
 # Çalışma dizini
 WORKDIR /app
 
+# Port metadata’sı (dokümantasyon için)
+EXPOSE 8000
+
 # Python bağımlılıkları
-COPY requirements.txt /app/requirements.txt
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Uygulama kodunu kopyala
-# src/ dizinindeki tüm dosyalar /app/ altında olacak şekilde
-COPY src/ /app/
+COPY src/ .
 
-# Uvicorn ile FastAPI'yi başlat
+# Başlat
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
