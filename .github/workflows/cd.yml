@@ -46,4 +46,4 @@ jobs:
             cd /opt/object-detection-service
             docker-compose pull web
             docker-compose up -d web
-            echo "🚀 Deployment completed on $(date)"
+            echo "Deployment completed on $(date)"
