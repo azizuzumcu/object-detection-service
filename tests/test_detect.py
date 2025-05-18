@@ -1,21 +1,27 @@
-import io
-import pytest
-from PIL import Image
+
+
+import os
 from app.detect import detect_objects
 
+TEST_DIR = os.path.join(os.path.dirname(__file__), "test_images")
 
-@pytest.fixture
-def tiny_car_image():
+def test_detect_car():
+    img_path = os.path.join(TEST_DIR, "car.jpg")
+    with open(img_path, "rb") as f:
+        results = detect_objects(f.read(), label="car")
+    assert any(obj["label"] == "car" for obj in results)
+    assert len(results) >= 1
 
-    img = Image.new("RGB", (20, 20), color=(255, 255, 255))
-    buf = io.BytesIO()
-    img.save(buf, format="JPEG")
-    return buf.getvalue()
+def test_detect_person():
+    img_path = os.path.join(TEST_DIR, "person.jpg")
+    with open(img_path, "rb") as f:
+        results = detect_objects(f.read(), label="person")
+    assert any(obj["label"] == "person" for obj in results)
+    assert len(results) >= 1
 
-
-def test_detect_returns_list(tiny_car_image):
-
-    results = detect_objects(tiny_car_image, label=None)
-    assert isinstance(results, list)
-
-    assert all("label" in r and "confidence" in r and "bbox" in r for r in results)
+def test_detect_multiple():
+    img_path = os.path.join(TEST_DIR, "multi.jpg")
+    with open(img_path, "rb") as f:
+        results = detect_objects(f.read(), label=None)
+    
+    assert len(results) >= 2

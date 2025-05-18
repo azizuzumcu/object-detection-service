@@ -172,7 +172,7 @@ def detect_objects(image_bytes: bytes, label: str = None):
     sess = load_model()
     outputs = sess.run(None, {"images": inp})
 
-    boxes, scores, labels = postprocess(outputs, conf_thres=0.1)
+    boxes, scores, labels = postprocess(outputs, conf_thres=0.5)
     keep = non_max_suppression(boxes, scores, iou_threshold=0.3)
     boxes = boxes[keep]
     scores = scores[keep]
