@@ -6,3 +6,10 @@ __pycache__/
 
 venv/
 .env
+
+# test resimleri
+*.jpeg
+*.jpg
+*.png
+# local deneme scripti
+preview.py
