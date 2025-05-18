@@ -5,14 +5,17 @@ from app.main import app
 
 client = TestClient(app)
 
+
 @pytest.fixture
 def white_jpeg():
     from PIL import Image
-    img = Image.new("RGB", (20, 20), color=(255,255,255))
+
+    img = Image.new("RGB", (20, 20), color=(255, 255, 255))
     buf = io.BytesIO()
     img.save(buf, format="JPEG")
     buf.seek(0)
     return buf
+
 
 def test_detect_endpoint_basic(white_jpeg):
     files = {"file": ("white.jpg", white_jpeg, "image/jpeg")}

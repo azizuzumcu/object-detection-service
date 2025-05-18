@@ -8,10 +8,13 @@ import base64
 
 app = FastAPI(title="Object Detection Service")
 
+
 @app.post("/detect")
 async def detect_endpoint(
     file: UploadFile = File(...),
-    label: str = Query(None, description="Filtrelemek isterseniz COCO etiketi, örn: car")
+    label: str = Query(
+        None, description="Filtrelemek isterseniz COCO etiketi, örn: car"
+    ),
 ):
     content = await file.read()
     try:
@@ -39,11 +42,10 @@ async def detect_endpoint(
     img.save(buf, format="JPEG")
     encoded = base64.b64encode(buf.getvalue()).decode("utf-8")
 
-    
     payload = {
         "objects": detections,
         "count": len(detections),
-        "annotated_image": f"data:image/jpeg;base64,{encoded}"
+        "annotated_image": f"data:image/jpeg;base64,{encoded}",
     }
 
     return JSONResponse(content=jsonable_encoder(payload))
