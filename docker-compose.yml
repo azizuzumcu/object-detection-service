@@ -8,7 +8,4 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # proje içindeki src klasörünü konteynıra /app/src olarak mount ediyoruz
-      - ./src:/app/src
-      # istersen model dosyalarını da mount et
-      # - ./src/app/model:/app/model
+      - ./src/app:/app/app
