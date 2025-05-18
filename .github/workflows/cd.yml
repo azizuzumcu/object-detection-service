@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -46,4 +46,4 @@ jobs:
             cd /opt/object-detection-service
             docker-compose pull web
             docker-compose up -d web
-            echo "Deployment completed on $(date)"
+            echo "🚀 Deployment completed on $(date)"
