@@ -4,7 +4,6 @@ from PIL import Image, ImageOps
 import io
 from pathlib import Path
 
-# COCO’nun 80 sınıf adı
 COCO_LABELS = [
     "person","bicycle","car","motorbike","aeroplane","bus","train","truck","boat","traffic light",
     "fire hydrant","stop sign","parking meter","bench","bird","cat","dog","horse","sheep","cow",
@@ -105,8 +104,8 @@ def detect_objects(image_bytes: bytes, label: str = None):
     for box, score, cls in zip(boxes.tolist(), scores.tolist(), labels.tolist()):
         cls_name = COCO_LABELS[int(cls)]
         if label is None or cls_name == label:
+            
             x1, y1, x2, y2 = box
-            # isteğe bağlı: sınır dışı taşmaları kes
             x1, y1 = max(x1, 0), max(y1, 0)
             x2, y2 = min(x2, orig_w), min(y2, orig_h)
             results.append({

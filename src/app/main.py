@@ -46,5 +46,4 @@ async def detect_endpoint(
         "annotated_image": f"data:image/jpeg;base64,{encoded}"
     }
 
-    # jsonable_encoder ile içerde kalan numpy/scalar objeleri dönüştürüyoruz
     return JSONResponse(content=jsonable_encoder(payload))
