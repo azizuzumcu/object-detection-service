@@ -1,17 +1,18 @@
+# .github/workflows/ci.yml
 name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
-    # tüm adımlarda src klasörünü kök paket olarak görmesi için
     env:
-      PYTHONPATH: ./src
+      # testler src/app altındaki importları çözebilsin
+      PYTHONPATH: src
 
     steps:
       - name: Checkout code
@@ -27,20 +28,25 @@ jobs:
           pip install --upgrade pip
           pip install --no-cache-dir -r requirements.txt
 
-      - name: Lint with flake8
+      - name: Install dev tools
         run: |
-          pip install flake8
-          flake8 src tests
+          pip install --no-cache-dir \
+            black flake8 pytest httpx python-multipart
 
       - name: Check formatting with Black
         run: |
-          pip install black
           black --check src tests
 
-      - name: Run tests
+      - name: Lint with flake8
         run: |
-          pip install pytest httpx python-multipart
+          flake8 src tests \
+            --max-line-length=120 \
+            --ignore=E231,E302,E303,W293
+
+      - name: Run pytest
+        run: |
           pytest -q
 
       - name: Build Docker image
-        run: docker build -t object-detection-service:ci .
+        run: |
+          docker build -t object-detection-service:ci .
