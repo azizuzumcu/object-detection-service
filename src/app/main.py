@@ -33,7 +33,7 @@ async def detect_endpoint(
             font = ImageFont.truetype("arial.ttf", size=16)
         except OSError:
             font = ImageFont.load_default()
-            
+
         text_bbox = draw.textbbox((x1, y1), text, font=font)
         draw.rectangle(text_bbox, fill="red")
         draw.text((text_bbox[0], text_bbox[1]), text, fill="white", font=font)

@@ -7,9 +7,4 @@ __pycache__/
 venv/
 .env
 
-
-*.jpeg
-*.jpg
-*.png
-
 preview.py
